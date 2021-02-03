@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from datetime import datetime, timedelta
 import urllib 
-
+from .store import delete_collection, get_articles_collection, set_updated_time
 
 def get_raw_news():
     NEWS_API_KEY = os.getenv('X_API_KEY')
@@ -24,14 +24,24 @@ def get_raw_news():
     return response.json() 
 
 
+# only import for named classes
+def update_articles(db):
+    good_news = get_good_news()
+    articles_collection = get_articles_collection(db) # collection ref.
+    # clear existing and store these 
+    delete_collection(articles_collection, 10) # clears article collection 
+    for article in good_news:
+        articles_collection.add(article)
+    set_updated_time(db)
+
+
 def get_good_news():
     raw_news = get_raw_news()
     # print(f'raw news', len(raw_news['articles']))
-    good_news = process_news(raw_news)
+    good_news = process_news(raw_news) 
+    # good_news = json.loads(test_news)
     # print(f'good news', len(good_news))
-
     return good_news
-    
 
 def process_news(news):
     AZURE_KEY = os.getenv('OCP_APIM_SUBSCRIPTION_KEY')
@@ -50,7 +60,7 @@ def process_news(news):
         # in a batch of 44, triggers after 10, 20, 30, 40, 44
         # in a batch of 43, triggers after 10, 20, 30, 40, 43
 
-        if batch_count == 10 or i + 1 == len(news['articles']):
+        if batch_count == 10:
             response = requests.post('https://good-news-test.cognitiveservices.azure.com/text/analytics/v3.0/sentiment', json = request_body, headers=headers)
             json_data = response.json()
             for result in json_data["documents"]:
@@ -58,14 +68,14 @@ def process_news(news):
                 news["articles"][article_pos]["sentiment"] = result 
             batch_count = 0 
             request_body = {"documents": []}
-    # if batch_count > 0: 
-    #     # we had some partial
-    #     response = requests.post('https://good-news-test.cognitiveservices.azure.com/text/analytics/v3.0/sentiment', json = request_body, headers=headers)
-    #     json_data = response.json()
-    #     # print(json_data)
-    #     for result in json_data["documents"]:
-    #         article_pos = int(result["id"])
-    #         news["articles"][article_pos]["sentiment"] = result 
+    if batch_count > 0: 
+        # we had some partial
+        response = requests.post('https://good-news-test.cognitiveservices.azure.com/text/analytics/v3.0/sentiment', json = request_body, headers=headers)
+        json_data = response.json()
+        # print(json_data)
+        for result in json_data["documents"]:
+            article_pos = int(result["id"])
+            news["articles"][article_pos]["sentiment"] = result 
     # print(f'image news', len(news['articles']))
     return filter_news(news) 
     # return news

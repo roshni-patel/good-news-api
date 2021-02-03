@@ -48,6 +48,7 @@ class Article:
     def from_firebase(cls, doc):
         doc_dict = doc.to_dict()
         article = cls.from_dict(doc_dict)
+        # we use doc directly, to get id, what other attribs are available??
         article.id = doc.id 
         return article
     
@@ -59,7 +60,7 @@ class Article:
             source_id=doc_dict['source']['id'], 
             source_name=doc_dict['source']['name'], 
             description=doc_dict.get('description'),
-            image_url=doc_dict.get('image_url'),
-            article_url=doc_dict.get('article_url'),
-            publication_date=doc_dict.get('publication_date'),
+            image_url=doc_dict.get('urlToImage'),
+            article_url=doc_dict.get('url'),
+            publication_date=doc_dict.get('publishedAt'),
             content=doc_dict.get('content'))
