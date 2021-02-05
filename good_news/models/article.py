@@ -1,6 +1,6 @@
 class Article: 
     def __init__(self, id=None, title=None, author=None, source_id=None, source_name=None, 
-        description=None, image_url=None, article_url=None, publication_date=None, content=None):
+        description=None, image_url=None, article_url=None, publication_date=None, content=None, sentiment=None):
 
         self.id = id 
         self.title = title
@@ -12,8 +12,10 @@ class Article:
         self.article_url = article_url 
         self.publication_date = publication_date 
         self.content = content 
+        self.sentiment = sentiment
 
-
+# we don't have id bc it dsn't belong in body of doc 
+# when we create 
     def to_firebase(self):
         return { 
             'title': self.title, 
@@ -29,6 +31,7 @@ class Article:
 
     def to_json(self): 
         return { 
+            'id': self.id,
             'title': self.title, 
             'author': self.author, 
             'source_id': self.source_id,
@@ -37,7 +40,8 @@ class Article:
             'image_url': self.image_url, 
             'article_url': self.article_url, 
             'publication_date': self.publication_date, 
-            'content': self.content
+            'content': self.content,
+            'sentiment': self.sentiment
             }
 
 
@@ -52,6 +56,7 @@ class Article:
         article.id = doc.id 
         return article
     
+    # maybe add from json/api, how we create an article 
     @classmethod
     def from_dict(cls, doc_dict):
         return Article(
@@ -63,4 +68,6 @@ class Article:
             image_url=doc_dict.get('urlToImage'),
             article_url=doc_dict.get('url'),
             publication_date=doc_dict.get('publishedAt'),
-            content=doc_dict.get('content'))
+            content=doc_dict.get('content'),
+            sentiment=doc_dict['sentiment']['sentiment']
+        )

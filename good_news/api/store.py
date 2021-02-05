@@ -4,16 +4,12 @@ ARTICLES_COLLECTION = 'articles'
 USERS_COLLECTION = 'users'
 CACHED_COLLECTION = 'configuration'
 
-def delete_collection(coll_ref, batch_size):
-    docs = coll_ref.limit(batch_size).stream()
-    deleted = 0
+# to delete we have to iterate over the contents of the collection and call delete on each one independently 
+def delete_collection(coll_ref):
+    docs = coll_ref.stream()
 
     for doc in docs:
         doc.reference.delete()
-        deleted = deleted + 1
-
-    if deleted >= batch_size:
-        return delete_collection(coll_ref, batch_size)
 
 def get_articles_collection(db):
     return db.collection(ARTICLES_COLLECTION)

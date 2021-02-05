@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import urllib 
 from .store import delete_collection, get_articles_collection, set_updated_time
 
+# TODO make multiple requests to get more articles
 def get_raw_news():
     NEWS_API_KEY = os.getenv('X_API_KEY')
     headers = {'X-Api-Key': NEWS_API_KEY}
@@ -29,7 +30,7 @@ def update_articles(db):
     good_news = get_good_news()
     articles_collection = get_articles_collection(db) # collection ref.
     # clear existing and store these 
-    delete_collection(articles_collection, 10) # clears article collection 
+    delete_collection(articles_collection) # clears article collection 
     for article in good_news:
         articles_collection.add(article)
     set_updated_time(db)
