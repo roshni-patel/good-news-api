@@ -1,3 +1,5 @@
+from .article import Article
+
 class User: 
     def __init__(self, id=None, name=None, email=None, saved_articles=None, filtered_articles=None, time_preference=None): # evaluated only once
         self.id = id 
@@ -29,12 +31,15 @@ class User:
     # as in firebase 
     @classmethod
     def from_dict(cls, doc_dict):
+        saved_articles = [Article.from_user_article(article_id, article_content) for article_id, article_content in doc_dict['saved_articles'].items()]
+
         return User(
-        name=doc_dict['name'],
-        email=doc_dict['email'],
-        saved_articles=doc_dict['saved_articles'], 
-        filtered_articles=doc_dict['filtered_articles'],
-        time_preference=doc_dict['time_preference'])
+            name=doc_dict['name'],
+            email=doc_dict['email'],
+            saved_articles=saved_articles, 
+            filtered_articles=doc_dict['filtered_articles'],
+            time_preference=doc_dict['time_preference']
+        )
     
 
     def to_json(self): 

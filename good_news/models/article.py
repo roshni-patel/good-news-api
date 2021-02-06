@@ -55,6 +55,12 @@ class Article:
         # we use doc directly, to get id, what other attribs are available??
         article.id = doc.id 
         return article
+
+    @classmethod 
+    def from_user_article(cls, article_id, article_dict):
+        article = cls.from_dict(article_dict)
+        article.id = article_id
+        return article
     
     # maybe add from json/api, how we create an article 
     @classmethod

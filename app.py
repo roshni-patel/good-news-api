@@ -68,8 +68,8 @@ def get_saved_articles(id):
     doc = db.collection(USERS_COLLECTION).document(id).get() 
     user = User.from_firebase(doc)
     user_articles = user.saved_articles
-    # json_articles = [article.to_json() for article in user_articles]
-    return jsonify(user_articles) # lets flask know about headers to send in respose
+    json_articles = [article.to_json() for article in user_articles] # added back in 
+    return jsonify(json_articles) # lets flask know about headers to send in respose
     # we want to generate json that represents an article
     # i need a collection of articles, then I can call to json to
     # if user saved articles is a list of ids, i need to iterate and retrieve each article 
@@ -83,7 +83,7 @@ def save_unsave_article(uid, aid):
     if request.method == 'POST':
         try:
             user_doc_ref.update({f'saved_articles.{aid}': article_doc_ref.get().to_dict()})
-            return jsonify({'Success': 'This article has been added to your saved articles'}) 
+            return jsonify({'Success': 'This article has been added to your saved articles'}) # could put ok true, false 
         except FirebaseError:
             return jsonify({'Error': 'There was an issue with saving that article'})
     else:
@@ -92,6 +92,21 @@ def save_unsave_article(uid, aid):
             return jsonify({'Success': 'This article has been removed from your saved articles'}) 
         except FirebaseError:
             return jsonify({'Error': 'There was an issue with unsaving that article'}) 
+
+
+# @app.route('/users/<id>', methods=('PUT',))
+# def create_update_user(id):
+#     user_doc_ref = db.collection(USERS_COLLECTION).document(id)
+#     user_doc = user_doc_ref.get()
+#     if user_doc.exists:
+#         return jsonify(user_doc)
+#     else:
+#         db.collection(USERS_COLLECTION).document(id).set()
+
+
+
+# id is whatever's google's id 
+# write to firestore db, frontend you would call this after sign in- ensure that the record is in DB, etc. 
 
 
 # @app.route('/users/<id>', methods=('GET', 'POST'))
