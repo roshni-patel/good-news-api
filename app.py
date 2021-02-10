@@ -93,67 +93,34 @@ def save_unsave_article(uid, aid):
         except FirebaseError:
             return jsonify({'Error': 'There was an issue with unsaving that article'}) 
 
+# just send user id
+# grab existing user document from users collection matching id given, check to see if they already have columns
+# if not update that user document to have full set of data items 
+# add to user provider 
+# when a user logs in, backend make sure to migrate this user, read the existing values and try and move them into expected fields defined 
+# just send the user id, grab the existing user doc from users collection, and check if they already have the columns expected for full user, if not update
+# to have full set of data items 
+# async user provider 
 
-# @app.route('/users/<id>', methods=('PUT',))
-# def create_update_user(id):
-#     user_doc_ref = db.collection(USERS_COLLECTION).document(id)
-#     user_doc = user_doc_ref.get()
-#     if user_doc.exists:
-#         return jsonify(user_doc)
-#     else:
-#         db.collection(USERS_COLLECTION).document(id).set()
-
-
-
-# id is whatever's google's id 
-# write to firestore db, frontend you would call this after sign in- ensure that the record is in DB, etc. 
-
-
-# @app.route('/users/<id>', methods=('GET', 'POST'))
-# def show_edit_profile(id):
-#     if request.method == 'POST':
-#         doc_ref = db.collection(USERS_COLLECTION).document(id) # is doc ref just grabbing the specific doc? 
-#         user = User.from_firebase(doc_ref.get())
-#         user.time_preference = request.form['time_preference']
-
-#         try: 
-#             doc_ref.update(user.to_firebase())
-#             return jsonify({'Success': 'Your profile has been updated'})  
-#         except FirebaseError:
-#             return jsonify({'Error': 'There was an issue updating your profile'})  
-#     else:
-#         doc_ref = db.collection(USERS_COLLECTION).document(id)
-#         user = User.from_firebase(doc_ref.get())
-#         return jsonify(user)
-
-
-# @app.route('users/<id>/filtered', methods=('GET',)):
-# def get_filtered_articles(id):
-#     doc_ref = db.collection(USERS_COLLECTION).document(id)
-
-
-
-# @app.route('/users/<uid>/filtered/<aid>', methods=('POST', 'PATCH')):
-# def filter_or_unfilter_article(uid, aid):
+# how google user stored in firestore - displayName, email, photoURL
+# @app.route('/users/<uid>', methods=('POST',))
+# def migrate_user(uid):
 #     user_doc_ref = db.collection(USERS_COLLECTION).document(uid)
-#     article_doc_ref = db.collection(ARTICLES_COLLECTION).document(aid)
 
-#     # need to push filtered out article into the array for the specific user 
-#     # filtered = request.form['aid']
-#     if request.method == 'POST':
-#         try: 
-#             user_doc_ref.update({'filtered_articles': firestore.ArrayUnion(['aid'])})
-#             user_doc_ref.update({'filtered_articles': firestore.ArrayUnion([article_doc_ref.get()])})
-#             return jsonify({'Success': 'This article has been removed from your feed'})
-#         except FirebaseError: 
-#             return jsonify({'Error': 'There was an issue with removing this article from your feed'})
-#     else: 
-#         try: 
-#             user_doc_ref.update({'filtered_articles': firestore.ArrayRemove(['aid'])})
-#             user_doc_ref.update({'filtered_articles': firestore.ArrayRemove([article_doc_ref.get()])})
-#             return jsonify({'Success': 'This article has been added back to your feed.'})
-#         except FirebaseError: 
-#             return jsonify({'Error': 'There was an issue with adding this article back to your feed'})
+#     FIELDS = ['name', 'email', 'saved_articles', 'filtered_articles', 'time_preference']
+#     # for field in FIELDS: 
+#     #     if user_doc_ref.get().to_dict().get(field) is None: 
+#     #         user_doc_ref.get().update
+
+#     name = user_doc_ref.get().to_dict()['displayName'] 
+#     email = user_doc_ref.get().to_dict()['email']
+#     saved_articles = user_doc_ref.get().update()
+
+# # we are returning json that represents the User instance?
+#     return jsonify()
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

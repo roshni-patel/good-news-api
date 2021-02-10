@@ -11,7 +11,7 @@ class User:
 
     def to_firebase(self):
         return { 
-            'name': self.name, 'email': self.email, 'saved_articles': self.saved_articles, 
+            'displayName': self.name, 'email': self.email, 'saved_articles': self.saved_articles, 
             'filtered_articles': self.filtered_articles, 'time_preference': self.time_preference 
         }
     
@@ -31,14 +31,14 @@ class User:
     # as in firebase 
     @classmethod
     def from_dict(cls, doc_dict):
-        saved_articles = [Article.from_user_article(article_id, article_content) for article_id, article_content in doc_dict['saved_articles'].items()]
+        saved_articles = [Article.from_user_article(article_id, article_content) for article_id, article_content in doc_dict.get('saved_articles', {}).items()]
 
         return User(
-            name=doc_dict['name'],
+            name=doc_dict['displayName'],
             email=doc_dict['email'],
             saved_articles=saved_articles, 
-            filtered_articles=doc_dict['filtered_articles'],
-            time_preference=doc_dict['time_preference']
+            filtered_articles=doc_dict.get('filtered_articles', []),
+            time_preference=doc_dict.get('time_preference')
         )
     
 
