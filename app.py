@@ -15,12 +15,23 @@ from good_news.models.article import Article
 from good_news.api.news import get_good_news, update_articles
 from good_news.api.store import (ARTICLES_COLLECTION, USERS_COLLECTION, CACHED_COLLECTION, 
     last_updated_time)
+import os
 
 
 from datetime import datetime, timedelta
 
-
-cred = credentials.Certificate("serviceAccountKey.json") # NOTE - for deployment where does this need to be kept? currently in gitignore 
+cred = credentials.Certificate({
+    "type": os.getenv('FIREBASE_TYPE'),
+    "project_id": os.getenv('FIREBASE_PROJECT_ID'),
+    "private_key_id": os.getenv('FIREBASE_PRIVATE_KEY_ID'),
+    "private_key": os.getenv('FIREBASE_PRIVATE_KEY').replace("\\n", "\n"),
+    "client_email": os.getenv('FIREBASE_CLIENT_EMAIL'),
+    "client_id": os.getenv('FIREBASE_CLIENT_ID'),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": os.getenv('FIREBASE_CLIENT')
+}) # NOTE - for deployment where does this need to be kept? currently in gitignore 
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
