@@ -32,8 +32,6 @@ CORS(app)
 # anytime react asks for current articles, check the last updated time, if i'm still within timeout period, just return existing 
 # cached articles, otherwise perform the news request, update the cached, return firebase data 
 # could add in an endpoint that does a refresh 
-
-
 def is_update_required():
     last_time = last_updated_time(db)
     max_diff = timedelta(days=1)
@@ -56,10 +54,6 @@ def get_articles():
     json_articles = [article.to_json() for article in articles]
     return jsonify(json_articles)
 
-# @app.route('/api-articles', methods=('GET',))
-# def get_api_articles():
-#     good_news = get_good_news()
-#     return jsonify(good_news)
 
 @app.route('/users/<id>/articles', methods=('GET',))
 def get_saved_articles(id):
@@ -92,34 +86,6 @@ def save_unsave_article(uid, aid):
             return jsonify({'Success': 'This article has been removed from your saved articles'}) 
         except FirebaseError:
             return jsonify({'Error': 'There was an issue with unsaving that article'}) 
-
-# just send user id
-# grab existing user document from users collection matching id given, check to see if they already have columns
-# if not update that user document to have full set of data items 
-# add to user provider 
-# when a user logs in, backend make sure to migrate this user, read the existing values and try and move them into expected fields defined 
-# just send the user id, grab the existing user doc from users collection, and check if they already have the columns expected for full user, if not update
-# to have full set of data items 
-# async user provider 
-
-# how google user stored in firestore - displayName, email, photoURL
-# @app.route('/users/<uid>', methods=('POST',))
-# def migrate_user(uid):
-#     user_doc_ref = db.collection(USERS_COLLECTION).document(uid)
-
-#     FIELDS = ['name', 'email', 'saved_articles', 'filtered_articles', 'time_preference']
-#     # for field in FIELDS: 
-#     #     if user_doc_ref.get().to_dict().get(field) is None: 
-#     #         user_doc_ref.get().update
-
-#     name = user_doc_ref.get().to_dict()['displayName'] 
-#     email = user_doc_ref.get().to_dict()['email']
-#     saved_articles = user_doc_ref.get().update()
-
-# # we are returning json that represents the User instance?
-#     return jsonify()
-
-
 
 
 if __name__ == '__main__':
