@@ -31,7 +31,7 @@ cred = credentials.Certificate({
     "token_uri": "https://oauth2.googleapis.com/token",
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": os.getenv('FIREBASE_CLIENT')
-}) # NOTE - for deployment where does this need to be kept? currently in gitignore 
+}) 
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -51,19 +51,6 @@ def is_update_required():
 
     return difference > max_diff 
 
-# maybe should change this to be just / so articles is the homepage? 
-# @app.route('/articles', methods=('GET',))
-# def get_articles():
-#     if is_update_required(): 
-#         update_articles(db)
-
-#     # regardless, we still want to retrieve whatever's stored in articles
-    
-#     # when we use stream it gives us the doc directly 
-#     docs =  db.collection(ARTICLES_COLLECTION).stream()
-#     articles = [Article.from_firebase(doc) for doc in docs]
-#     json_articles = [article.to_json() for article in articles]
-#     return jsonify(json_articles)
 
 @app.route('/', methods=('GET',))
 def get_articles():

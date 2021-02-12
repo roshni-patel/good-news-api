@@ -5,10 +5,12 @@ import json
 from dotenv import load_dotenv
 load_dotenv()
 from datetime import datetime, timedelta
+import time 
 import urllib 
 from .store import delete_collection, get_articles_collection, set_updated_time
+import math 
 
-# TODO make multiple requests to get more articles
+
 def get_raw_news():
     NEWS_API_KEY = os.getenv('X_API_KEY')
     headers = {'X-Api-Key': NEWS_API_KEY}
@@ -20,9 +22,56 @@ def get_raw_news():
         'pageSize': 100, 
         'sortBy': 'popularity'
     }
-    # print(f'https://newsapi.org/v2/everything?{urllib.parse.urlencode(params)}')
+
+    # Get the first page of results, and note the total number of results available.
+    # If this is the first set of results, set it aside in a total result variable.
     response = requests.get(f'https://newsapi.org/v2/everything?{urllib.parse.urlencode(params)}', headers=headers)
-    return response.json() 
+    total_articles = response.json() 
+    total_num_results = total_articles['totalResults']
+    num_requests = math.ceil((total_num_results) / 100) # with 750 num requests should be 8 
+
+    # Add the number of retrieved results to a count of the results fetched so far.
+    retrieved_results = len(total_articles['articles'])
+
+    # If this is not the first set of results, get the articles from this result and add to the total result.
+    page = 2
+    while retrieved_results <= total_num_results and page <= num_requests: 
+        params = {
+            'sources': ','.join(["Buzzfeed","Google News", "New York Times", "The Huffington Post", "CNN", "NBC News", "The Washington Post", "ABC News", "BBC News", "Next Big Future", "New Scientist", "Medical News Today", "TechCrunch", "Ars Technica", "Wired", "The Next Web", "Bloomberg", "The Wall Street Journal", "Business Insider"]),
+            'language': 'en', 
+            'from': d, 
+            'pageSize': 100, 
+            'sortBy': 'popularity',
+            'page': page
+        }
+
+        time.sleep(0.5)
+        response = requests.get(f'https://newsapi.org/v2/everything?{urllib.parse.urlencode(params)}', headers=headers)  
+        page += 1
+        next_response = response.json() # takes that body text and converts to dict/arrays 
+        next_articles = next_response.get('articles')
+        if not next_articles: break  
+        retrieved_results += len(next_articles)
+        total_articles['articles'].extend(next_articles)
+
+    return total_articles
+
+
+# The original method 
+# def get_raw_news():
+#     NEWS_API_KEY = os.getenv('X_API_KEY')
+#     headers = {'X-Api-Key': NEWS_API_KEY}
+#     d = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+#     params = { 
+#         'sources': ','.join(["Buzzfeed","Google News", "New York Times", "The Huffington Post", "CNN", "NBC News", "The Washington Post", "ABC News", "BBC News", "Next Big Future", "New Scientist", "Medical News Today", "TechCrunch", "Ars Technica", "Wired", "The Next Web", "Bloomberg", "The Wall Street Journal", "Business Insider"]),
+#         'language': 'en', 
+#         'from': d, 
+#         'pageSize': 100, 
+#         'sortBy': 'popularity'
+#     }
+#     response = requests.get(f'https://newsapi.org/v2/everything?{urllib.parse.urlencode(params)}', headers=headers)
+#     print(response.json())
+#     return response.json() 
 
 
 # only import for named classes
